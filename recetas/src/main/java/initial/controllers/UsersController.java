@@ -5,8 +5,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,14 +37,9 @@ public class UsersController {
 	@GetMapping("/{id}")
 	public Users getUserById(@PathVariable String id) {
 		Optional<Users> optionalUser = userRepository.findById(id);
-		Users user;
-		if (optionalUser.isPresent()) {
-			user = optionalUser.get();
-			return user;
-		}
-		else {
-			return null;
-		}
+		
+		Users user = optionalUser.get();
+		return user;
 	}
 	
 	@PostMapping("")
@@ -59,20 +52,30 @@ public class UsersController {
 	
 	}
 	
+	@PutMapping("/{id}")
+	public Users updateUser(@PathVariable String id, @RequestParam("username") String username, @RequestParam("password") String password) {
+		Optional<Users> optionalUser = userRepository.findById(id);
+		Users user = optionalUser.get();
+		
+		if(optionalUser.isPresent()) {
+			user.setUsername(username);
+			user.setPassword(password);
+		}
+		
+		return user;
+	}
+	
 	@DeleteMapping("/{id}")
 	public Users deleteUser(@PathVariable String id) {
 		Optional<Users> optionalUser = userRepository.findById(id);
-		Users user;
 		
-		if (optionalUser.isPresent()) {
-			user = optionalUser.get();
-			userRepository.deleteById(id);
-			return user;
+		Users user = optionalUser.get();
+		
+		if(optionalUser.isPresent()) {
+			userRepository.delete(user);
 		}
 		
-		else {	
-			return null;
-		}
+		return user;
 		
 	}
 	

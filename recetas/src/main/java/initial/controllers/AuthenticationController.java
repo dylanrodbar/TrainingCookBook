@@ -9,6 +9,7 @@ import java.util.HashMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,11 +36,11 @@ public class AuthenticationController {
 		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
 	}
 	
-	@RequestMapping("/sign-up")
-	public HashMap<String, String> signUp(@RequestParam("username") String username, @RequestParam("password") String password) {
+	@PostMapping("/sign-up")
+	public HashMap<String, String> signUp(@RequestBody Users user) {
 		
-		String encPassword = bCryptPasswordEncoder.encode(password);
-		Users user = new Users(username, encPassword);
+		String encPassword = bCryptPasswordEncoder.encode(user.getPassword());
+		user.setPassword(encPassword);
 		userRepository.save(user);
 		
 		String token = Jwts.builder()
@@ -49,7 +50,8 @@ public class AuthenticationController {
                 .compact();
 		
 		HashMap<String, String> returnUser = new HashMap<>();
-        
+		
+		
 		returnUser.put("username", user.getUsername());
         returnUser.put("token", token);
 		

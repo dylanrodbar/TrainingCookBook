@@ -20,7 +20,6 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,7 +30,6 @@ import static initial.constants.TestUrl.USERS;
 public class UsersControllerTest {
 	
 	
-	// se usa para simular datos
 	@Autowired
 	private MockMvc mvc;
 
@@ -46,11 +44,8 @@ public class UsersControllerTest {
 
 	    List<Users> allUsers = singletonList(user);
 
-	    // se asegura de que el metodo getAllUsers() retorne una lista
 	    given(userController.getAllUsers()).willReturn(allUsers);
 
-	    // se hace un request get a /users para confirmar que se devuelva un json de tamano 1, ademas de comprobar que el username retornado
-	    // sea igual al user creado anteriormente
 	    mvc.perform(get(USERS)
 	            .with(user("dylan1234").password("dylan12345"))
 	            .contentType(APPLICATION_JSON))
