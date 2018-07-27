@@ -8,12 +8,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 
 import initial.models.Users;
 import initial.repositories.UsersRepository;
@@ -30,52 +33,77 @@ public class UsersController {
 	}
 	
 	@GetMapping("")
-	public List<Users> getAllUsers() {
-		return userRepository.findAll();
+	public ResponseEntity getAllUsers() {
+		List<Users> users = userRepository.findAll();
+		return new ResponseEntity<>(users, HttpStatus.OK);
 	}
 	
 	@GetMapping("/{id}")
-	public Users getUserById(@PathVariable String id) {
-		Optional<Users> optionalUser = userRepository.findById(id);
+	public ResponseEntity getUserById(@PathVariable String id) {
 		
-		Users user = optionalUser.get();
-		return user;
+		Optional<Users> optionalUser = userRepository.findById(id);
+		Users user;
+		
+		if(optionalUser.isPresent()) {
+			user = optionalUser.get();
+			return new ResponseEntity<>(user, HttpStatus.OK);
+		}
+		
+		
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		
+		
+		
 	}
 	
 	@PostMapping("")
-	public Users addUser(@RequestParam("username") String username, @RequestParam("password") String password) {
+	public ResponseEntity addUser(@RequestParam("username") String username, @RequestParam("password") String password) {
 		
-		Users user = new Users(username, password);
-		userRepository.save(user);
+		Users userInDB = userRepository.findByUsername(username);
 		
-		return user;
+		if (userInDB == null) {
+			
+			Users user = new Users(username, password);
+			userRepository.save(user);
+			return new ResponseEntity<>(user, HttpStatus.OK);
+		
+		} 
+		
+		return new ResponseEntity<>(HttpStatus.CONFLICT);
 	
 	}
 	
 	@PutMapping("/{id}")
-	public Users updateUser(@PathVariable String id, @RequestParam("username") String username, @RequestParam("password") String password) {
+	public ResponseEntity updateUser(@PathVariable String id, @RequestBody Users user) {
+		
 		Optional<Users> optionalUser = userRepository.findById(id);
-		Users user = optionalUser.get();
+		Users userUpdate;
+		
 		
 		if(optionalUser.isPresent()) {
-			user.setUsername(username);
-			user.setPassword(password);
+			userUpdate = optionalUser.get();
+			userUpdate.setPassword(user.getPassword());
+			userRepository.save(userUpdate);
+			return new ResponseEntity<>(userUpdate, HttpStatus.OK);
 		}
 		
-		return user;
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 	
 	@DeleteMapping("/{id}")
-	public Users deleteUser(@PathVariable String id) {
+	public ResponseEntity deleteUser(@PathVariable String id) {
+		
 		Optional<Users> optionalUser = userRepository.findById(id);
 		
-		Users user = optionalUser.get();
+		Users user;
 		
 		if(optionalUser.isPresent()) {
+			user = optionalUser.get();
 			userRepository.delete(user);
+			return new ResponseEntity<>(HttpStatus.OK);
 		}
 		
-		return user;
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		
 	}
 	

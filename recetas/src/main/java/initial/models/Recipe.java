@@ -14,7 +14,6 @@ public class Recipe {
 	public String _id;
 	
 	
-	
 	private String name;
 	private String description;
 	private String ingredients;

@@ -11,6 +11,7 @@ public class Users {
 	@Id
 	private String _id;
 	
+	@Indexed(unique = true)
 	private String username;
 	private String password;
 	
