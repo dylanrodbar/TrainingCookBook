@@ -29,20 +29,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
   
-      /*
-	  @Override
-	  protected void configure(HttpSecurity http) throws Exception {
-		  http
-		    .csrf().disable()
-		    .authorizeRequests()
-		    	.antMatchers(HttpMethod.POST, "/login").permitAll()
-		    	.antMatchers("/users/all").permitAll()
-		    	.antMatchers("/").permitAll()
-		    	.antMatchers("/users/add").permitAll()
-		    	.anyRequest().authenticated();
-		  
-	  }
-     */
+      
     
 	    @Override
 	    protected void configure(HttpSecurity http) throws Exception {

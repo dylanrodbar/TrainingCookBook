@@ -4,7 +4,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,9 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import initial.models.Recipe;
-import initial.models.Users;
 import initial.repositories.RecipesRepository;
-import initial.repositories.UsersRepository;
 
 @RestController
 @RequestMapping("/recipes")

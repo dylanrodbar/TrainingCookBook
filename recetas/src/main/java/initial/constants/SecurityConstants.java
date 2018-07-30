@@ -1,8 +1,5 @@
 package initial.constants;
 
-/*
-   * en esta clase se generan las constantes que se utilizan en las clases de JWTAuthenticationFilter  
-*/
 public class SecurityConstants {
 	
 	public static final String SECRET = "SecretKeyToGenJWTs";

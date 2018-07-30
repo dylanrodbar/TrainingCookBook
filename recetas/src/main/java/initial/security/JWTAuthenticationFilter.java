@@ -3,6 +3,8 @@ package initial.security;
 
 import static initial.constants.SecurityConstants.EXPIRATION_TIME;
 import static initial.constants.SecurityConstants.SECRET;
+import static initial.constants.SecurityConstants.HEADER_STRING;
+import static initial.constants.SecurityConstants.TOKEN_PREFIX;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,15 +23,13 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import initial.models.Users;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 
-/* 
-   * con esa clase se van a procesar las credenciales de usuario, las cuales seran pasadas al AuthenticationManager
-   * si las credenciales son correctas, entonces se va a generar un jwt para el usuario
-*/
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	
 	private AuthenticationManager authenticationManager;
@@ -46,48 +46,43 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(HttpServletRequest req,
                                              HttpServletResponse res) throws AuthenticationException {
     	
-    	String username = req.getParameter("username");
-		String password = req.getParameter("password");
-		
-		return authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        username,
-                        password,
-                        new ArrayList<>())
-        );
+    	
+    	
+    	try {
+            Users creds = new ObjectMapper()
+                    .readValue(req.getInputStream(), Users.class);
+            
+            return authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            creds.getUsername(),
+                            creds.getPassword(),
+                            new ArrayList<>())
+            );
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    	
 		
     }
     
-    public HashMap<String, String> returnJson(String jsonmsg) {
-    	HashMap<String, String> map = new HashMap<>();
-        map.put("key1", "value1");
-        return map;
-    }
-
-    
-    /*
-       * se llega a este metodo, en caso de que las credenciales del usuario sean correctas 
-    */
+   
     @Override
     protected void successfulAuthentication(HttpServletRequest req,
                                             HttpServletResponse res,
                                             FilterChain chain,
                                             Authentication auth) throws IOException, ServletException {
 
-    	/*
-    	   * aqui se genera el token 
-    	*/
+    	
         String token = Jwts.builder()
                 .setSubject(((User) auth.getPrincipal()).getUsername())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS512, SECRET.getBytes())
                 .compact();
-        //res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
+                
+        res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
+        res.setStatus(HttpServletResponse.SC_OK);
         
-        System.out.println("token");
-        System.out.println(token);
         
-        returnJson(token);
     }
     
     
@@ -98,6 +93,9 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             ) throws IOException, ServletException {
 
     	System.out.println(failed.toString());
+    	res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    	
+    	
     }
     
 

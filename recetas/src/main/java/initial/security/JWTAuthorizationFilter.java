@@ -18,10 +18,7 @@ import static initial.constants.SecurityConstants.HEADER_STRING;
 import static initial.constants.SecurityConstants.SECRET;
 import static initial.constants.SecurityConstants.TOKEN_PREFIX;
 
-/* 
-   * en esta clase se toma en cuenta todo lo necesario para la autorizacion, es decir, si el token se esta pasando en el formato correcto
-   * ademas, tambien valida si el token que se esta pasando es valido o no
-*/
+
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 	
 	public JWTAuthorizationFilter(AuthenticationManager authManager) {

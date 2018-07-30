@@ -3,6 +3,7 @@ package initial.models;
 import java.util.ArrayList;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -11,6 +12,7 @@ public class Recipe {
 	
 	@Id
 	public String _id;
+	
 	
 	private String name;
 	private String description;
