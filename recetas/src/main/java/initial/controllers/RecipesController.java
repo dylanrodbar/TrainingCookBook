@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import initial.models.Image;
 import initial.models.Recipe;
 import initial.repositories.RecipesRepository;
 
@@ -28,57 +31,58 @@ public class RecipesController {
 	}
 	
 	@GetMapping("")
-	public List<Recipe> getAllRecipes() {
-		return recipeRepository.findAll();
+	public ResponseEntity getAllRecipes() {
+		List<Recipe> recipes = recipeRepository.findAll();
+		return new ResponseEntity(recipes, HttpStatus.OK);
 	}
 	
 	@GetMapping("/{id}")
-	public Recipe getRecipeById(@PathVariable String id) {
-		Optional<Recipe> optionalRecipe = recipeRepository.findById(id);
-		
-		Recipe recipe = optionalRecipe.get();
-		return recipe;
-		
-	}
-	
-	@PostMapping("")
-	public Recipe addRecipe(@RequestParam("name") String name, @RequestParam("description") String description, @RequestParam("ingredients") String ingredients, @RequestParam("preparation") String preparation) {
-		
-		Recipe recipe = new Recipe(name, description, ingredients, preparation);
-		recipeRepository.save(recipe);
-		
-        return recipe;
-	
-	}
-	
-	@PutMapping("/{id}")
-	public Recipe updateRecipe(@PathVariable String id, @RequestParam("name") String name, @RequestParam("description") String description, @RequestParam("ingredients") String ingredients, @RequestParam("preparation") String preparation) {
-		Optional<Recipe> optionalRecipe = recipeRepository.findById(id);
-		Recipe recipe = optionalRecipe.get();
+	public ResponseEntity getRecipeById(@PathVariable String id) {
+		Optional<Recipe> optionalRecipe =  recipeRepository.findById(id);
+		Recipe recipe;
 		
 		if(optionalRecipe.isPresent()) {
-			recipe.setName(name);
-			recipe.setDescription(description);
-			recipe.setIngredients(ingredients);
-			recipe.setPreparation(preparation);
+			
+			recipe = optionalRecipe.get();
+			return new ResponseEntity(recipe, HttpStatus.OK);
+		
 		}
 		
-		return recipe;
+		return new ResponseEntity(HttpStatus.NOT_FOUND);
+		
 	}
 	
-	@DeleteMapping("/{id}")
-	public Recipe deleteRecipe(@PathVariable String id) {
+	@GetMapping("/{id}/images")
+	public ResponseEntity getAllRecipeImages(@PathVariable String id) {
 		Optional<Recipe> optionalRecipe = recipeRepository.findById(id);
-		
-		Recipe recipe = optionalRecipe.get();
+		Recipe recipe;
 		
 		if(optionalRecipe.isPresent()) {
-			recipeRepository.delete(recipe);
+			
+			recipe = optionalRecipe.get();
+			return new ResponseEntity<>(recipe.getImages(), HttpStatus.OK);
+		
 		}
 		
-		return recipe;
-		
-		
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
+	
+		
+	@GetMapping("/{id}/videos")
+	public ResponseEntity getAllRecipeVideos(@PathVariable String id) {
+		Optional<Recipe> optionalRecipe =  recipeRepository.findById(id);
+		Recipe recipe;
+		
+		if(optionalRecipe.isPresent()) {
+			
+			recipe = optionalRecipe.get();
+			return new ResponseEntity<>(recipe.getVideos(), HttpStatus.OK);
+		
+		}
+		
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	}
+	
+	
 
 }
