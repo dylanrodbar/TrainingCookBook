@@ -152,6 +152,48 @@ public class RecipesControllerTest {
 		given(recipesController.getAllRecipes()).willReturn(response);
 	}
 	
+	
+	@Test
+	public void shouldReturn200WhenAddingANewRecipe() throws Exception {
+		
+		ArrayList<Image> images = new ArrayList<>();
+		ArrayList<Video> videos = new ArrayList<>();
+		
+		images.add(new Image("link1"));
+		videos.add(new Video("link2"));
+		
+		Recipe recipe = new Recipe("nametest", "descriptiontest", "ingredientstest", "preparationtest", images, videos);
+		
+		mvc.perform(post(RECIPES)
+	            .with(user("dylan1234").password("dylan12345"))
+	            .contentType(APPLICATION_JSON)
+	            .with(csrf())
+				.content(new ObjectMapper().writeValueAsBytes(recipe)))
+	            .andExpect(status().isOk());
+		
+		
+		
+	}
+	
+	@Test
+	public void shouldReturnRecipeWhenAddingANewRecipe() throws Exception {
+		
+		ArrayList<Image> images = new ArrayList<>();
+		ArrayList<Video> videos = new ArrayList<>();
+		
+		images.add(new Image("link1"));
+		videos.add(new Video("link2"));
+		
+		Recipe recipe = new Recipe("nametest", "descriptiontest", "ingredientstest", "preparationtest", images, videos);
+		
+		ResponseEntity response = new ResponseEntity(recipe, HttpStatus.OK);
+		
+		given(recipesController.addRecipe(recipe)).willReturn(response);
+		
+		
+		
+	}
+	
 
 
 }

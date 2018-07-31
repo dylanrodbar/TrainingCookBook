@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import initial.models.Image;
 import initial.models.Recipe;
+import initial.models.Users;
 import initial.repositories.RecipesRepository;
 
 @RestController
@@ -82,6 +84,25 @@ public class RecipesController {
 		
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
+	
+	@PostMapping("")
+	public ResponseEntity addRecipe(@RequestBody Recipe recipe) {
+		if(recipe.getName() == null ||
+			recipe.getDescription() == null ||
+			recipe.getIngredients() == null ||
+			recipe.getPreparation() == null ||
+			recipe.getImages()      == null ||
+			recipe.getVideos()      == null) {
+			
+			return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+		recipeRepository.save(recipe);
+		return new ResponseEntity<>(recipe, HttpStatus.OK);
+		
+	}
+	
+	
+	
 	
 	
 

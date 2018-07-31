@@ -7,6 +7,8 @@ public class Video {
 	
 	private String link;
 	
+	public Video() {}
+	
 	public Video(String link) {
 		this.link = link;
 	}

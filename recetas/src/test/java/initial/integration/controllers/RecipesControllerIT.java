@@ -187,5 +187,93 @@ public class RecipesControllerIT {
    
     	assertEquals(expectedResponse, responseEntity.getBody().toString());
     }
+    
+    
+    @Test
+    public void shouldReturn200WhenAddingANewRecipe() throws Exception {
+    	ArrayList<Image> images = new ArrayList<>();
+    	ArrayList<Video> videos = new ArrayList<>();
+    	images.add(new Image("linktestimage10"));
+    	images.add(new Image("linktestimage11"));
+    	videos.add(new Video("linktestvideo12"));
+    	Recipe recipe = new Recipe("nametest2", "descriptiontest2", "ingredientstest2", "preparationtest2", images, videos);
+    	
+    	String id = recipesRepository.save(recipe)._id;
+    	
+    	HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON));
+        headers.add("Authorization", "Auth " + tokenAuth);
+    	
+        HttpEntity entity = new HttpEntity(recipe, headers);
+    	
+    	ResponseEntity responseEntity = restTemplate.exchange(
+                "/recipes", 
+                HttpMethod.POST, 
+                entity, 
+                String.class);
+    	
+    	assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+    }
+    
+    @Test
+    public void shouldReturnRecipeWhenAddingANewRecipe() throws Exception {
+    	ArrayList<Image> images = new ArrayList<>();
+    	ArrayList<Video> videos = new ArrayList<>();
+    	images.add(new Image("linktestimage10"));
+    	images.add(new Image("linktestimage11"));
+    	videos.add(new Video("linktestvideo12"));
+    	Recipe recipe = new Recipe("nametest2", "descriptiontest2", "ingredientstest2", "preparationtest2", images, videos);
+    	
+    	String id = recipesRepository.save(recipe)._id;
+    	
+    	HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON));
+        headers.add("Authorization", "Auth " + tokenAuth);
+    	
+        HttpEntity entity = new HttpEntity(recipe, headers);
+    	
+    	ResponseEntity<Recipe> responseEntity = restTemplate.exchange(
+                "/recipes", 
+                HttpMethod.POST, 
+                entity, 
+                Recipe.class);
+    	
+    	
+    	assertEquals(recipe.getName(), responseEntity.getBody().getName());
+    	assertEquals(recipe.getDescription(), responseEntity.getBody().getDescription());
+    	assertEquals(recipe.getIngredients(), responseEntity.getBody().getIngredients());
+    	assertEquals(recipe.getPreparation(), responseEntity.getBody().getPreparation());
+    	assertEquals(recipe.getImages().size(), responseEntity.getBody().getImages().size());
+    	assertEquals(recipe.getVideos().size(), responseEntity.getBody().getVideos().size());
+    }
+    
+    @Test
+    public void shouldReturn422WhenAddingANewRecipe() throws Exception {
+    	ArrayList<Image> images = new ArrayList<>();
+    	ArrayList<Video> videos = new ArrayList<>();
+    	images.add(new Image("linktestimage10"));
+    	images.add(new Image("linktestimage11"));
+    	videos.add(new Video("linktestvideo12"));
+    	Recipe recipe = new Recipe(null, "descriptiontest2", "ingredientstest2", "preparationtest2", images, videos);
+    	
+    	String id = recipesRepository.save(recipe)._id;
+    	
+    	HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON));
+        headers.add("Authorization", "Auth " + tokenAuth);
+    	
+        HttpEntity entity = new HttpEntity(recipe, headers);
+    	
+    	ResponseEntity responseEntity = restTemplate.exchange(
+                "/recipes", 
+                HttpMethod.POST, 
+                entity, 
+                String.class);
+    	
+    	assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, responseEntity.getStatusCode());
+    }
 
 }

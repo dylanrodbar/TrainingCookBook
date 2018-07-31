@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document
+@Document(collection = "recipe")
 public class Recipe {
 	
 	@Id
