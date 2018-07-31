@@ -44,8 +44,6 @@ public class UsersControllerTest {
 
 	    List<Users> allUsers = singletonList(user);
 
-	    given(userController.getAllUsers()).willReturn(allUsers);
-
 	    mvc.perform(get(USERS)
 	            .with(user("dylan1234").password("dylan12345"))
 	            .contentType(APPLICATION_JSON))
