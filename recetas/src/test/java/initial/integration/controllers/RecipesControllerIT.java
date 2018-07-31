@@ -1,29 +1,42 @@
 package initial.integration.controllers;
 
 
+import static initial.constants.SecurityConstants.EXPIRATION_TIME;
+import static initial.constants.SecurityConstants.SECRET;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
+import org.assertj.core.util.Lists;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.support.BasicAuthorizationInterceptor;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -32,6 +45,8 @@ import initial.models.Recipe;
 import initial.models.Users;
 import initial.models.Video;
 import initial.repositories.RecipesRepository;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -46,14 +61,28 @@ public class RecipesControllerIT {
 	@Autowired
     private TestRestTemplate restTemplate;
 	
+	private String tokenAuth;
+	
+	
+	
+	
 	@Before
     public void setup() throws Exception {
-        mongoTemplate.dropCollection(Recipe.class);
+		
+		String token = Jwts.builder()
+                .setSubject("test")
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(SignatureAlgorithm.HS512, SECRET.getBytes())
+                .compact();
+    	
+    	this.tokenAuth = token;
+        mongoTemplate.dropCollection(Recipe.class);  
     }
     @After
     public void tearDown() throws Exception {
         mongoTemplate.dropCollection(Recipe.class);
     }
+    
     
     @Test
     public void testShouldReturn200WhenGettingAllRecipes() throws Exception {
@@ -63,16 +92,24 @@ public class RecipesControllerIT {
     	images.add(new Image("linktestimage1"));
     	images.add(new Image("linktestimage2"));
     	videos.add(new Video("linktestvideo1"));
+    	
     	Recipe recipe = new Recipe("nametest", "descriptiontest", "ingredientstest", "preparationtest", images, videos);
     	
     	recipesRepository.save(recipe);
     	
+    	HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON));
+        headers.add("Authorization", "Auth " + tokenAuth);
     	
+        HttpEntity entity = new HttpEntity(headers);
     	
-    	ResponseEntity<? extends ArrayList<Recipe>> responseEntity = restTemplate.getForEntity("/recipes", (Class<? extends ArrayList<Recipe>>)ArrayList.class);
+    	ResponseEntity responseEntity = restTemplate.exchange(
+                "/recipes", 
+                HttpMethod.GET, 
+                entity, 
+                String.class);
     	
-    	System.out.println("asasdasdas");
-    	System.out.println(responseEntity.getBody().toString());
     	
     	assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     	
@@ -91,10 +128,20 @@ public class RecipesControllerIT {
     	
     	String id = recipesRepository.save(recipe)._id;
     	
+    	HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON));
+        headers.add("Authorization", "Auth " + tokenAuth);
+    	
+        HttpEntity entity = new HttpEntity(headers);
+    	
+    	ResponseEntity responseEntity = restTemplate.exchange(
+                "/recipes/"+id, 
+                HttpMethod.GET, 
+                entity, 
+                String.class);
     	
         
-    	ResponseEntity responseEntity = restTemplate.getForEntity("/recipes/"+id, String.class);
-    	
     	String idExpected = "{\"_id\":\""+id+"\"";
     	String expectedResponse = idExpected+",\"name\":\"nametest2\",\"description\":\"descriptiontest2\""
     			+ ",\"ingredients\":\"ingredientstest2\",\"preparation\":\"preparationtest2\",\"images\":[{\"link\":\"linktestimage10\"}"
@@ -117,10 +164,20 @@ public class RecipesControllerIT {
     	
     	String id = recipesRepository.save(recipe)._id;
     	
+    	HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON));
+        headers.add("Authorization", "Auth " + tokenAuth);
     	
+        HttpEntity entity = new HttpEntity(headers);
+    	
+    	ResponseEntity responseEntity = restTemplate.exchange(
+                "/recipes/"+id, 
+                HttpMethod.GET, 
+                entity, 
+                String.class);
         
-    	ResponseEntity responseEntity = restTemplate.getForEntity("/recipes/"+id, String.class);
-    	
+    
     	String idExpected = "{\"_id\":\""+id+"\"";
     	String expectedResponse = idExpected+",\"name\":\"nametest2\",\"description\":\"descriptiontest2\""
     			+ ",\"ingredients\":\"ingredientstest2\",\"preparation\":\"preparationtest2\",\"images\":[{\"link\":\"linktestimage10\"}"
