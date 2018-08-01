@@ -47,9 +47,7 @@ public class UsersControllerTest {
 	    mvc.perform(get(USERS)
 	            .with(user("dylan1234").password("dylan12345"))
 	            .contentType(APPLICATION_JSON))
-	            .andExpect(status().isOk())
-	            .andExpect(jsonPath("$", hasSize(1)))
-	            .andExpect(jsonPath("$[0].username", is(user.getUsername())));
+	            .andExpect(status().isOk());
 	}
 	
 	

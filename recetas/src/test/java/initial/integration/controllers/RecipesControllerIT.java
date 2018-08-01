@@ -337,5 +337,92 @@ public class RecipesControllerIT {
     	assertEquals(responseEntity.getBody().getPreparation(), updateRecipe.getPreparation());
         
     }
+    
+    @Test
+    public void shouldReturn404WhenUpdatingAWringRecipe() throws Exception {
+    	ArrayList<Image> images = new ArrayList<>();
+    	ArrayList<Video> videos = new ArrayList<>();
+    	images.add(new Image("linktestimage10"));
+    	images.add(new Image("linktestimage11"));
+    	videos.add(new Video("linktestvideo12"));
+    	Recipe recipe = new Recipe("nametest2", "descriptiontest2", "ingredientstest2", "preparationtest2", images, videos);
+    	Recipe updateRecipe = new Recipe("nametest3", "descriptiontest3", "ingredientstest3", "preparationtest3", images, videos);
+    	
+    	String id = recipesRepository.save(recipe)._id;
+    	String badId = "1";
+    	
+    	HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON));
+        headers.add("Authorization", "Auth " + tokenAuth);
+        
+        HttpEntity entity = new HttpEntity(updateRecipe, headers);
+        
+        ResponseEntity<Recipe> responseEntity = restTemplate.exchange(
+                "/recipes/"+badId, 
+                HttpMethod.PUT, 
+                entity, 
+                Recipe.class);
+    	
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        
+    }
+    
+    @Test
+    public void shouldReturn200WhenDeletingARecipe() throws Exception {
+    	ArrayList<Image> images = new ArrayList<>();
+    	ArrayList<Video> videos = new ArrayList<>();
+    	images.add(new Image("linktestimage10"));
+    	images.add(new Image("linktestimage11"));
+    	videos.add(new Video("linktestvideo12"));
+    	Recipe recipe = new Recipe("nametest2", "descriptiontest2", "ingredientstest2", "preparationtest2", images, videos);
+    	Recipe updateRecipe = new Recipe("nametest3", "descriptiontest3", "ingredientstest3", "preparationtest3", images, videos);
+    	
+    	String id = recipesRepository.save(recipe)._id;
+    	
+    	HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON));
+        headers.add("Authorization", "Auth " + tokenAuth);
+        
+        HttpEntity entity = new HttpEntity(updateRecipe, headers);
+        
+        ResponseEntity responseEntity = restTemplate.exchange(
+                "/recipes/"+id, 
+                HttpMethod.DELETE, 
+                entity, 
+                String.class);
+    	
+    	assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+    }
+    
+    @Test
+    public void shouldReturn404WhenDeletingAWrongRecipe() throws Exception {
+    	ArrayList<Image> images = new ArrayList<>();
+    	ArrayList<Video> videos = new ArrayList<>();
+    	images.add(new Image("linktestimage10"));
+    	images.add(new Image("linktestimage11"));
+    	videos.add(new Video("linktestvideo12"));
+    	Recipe recipe = new Recipe("nametest2", "descriptiontest2", "ingredientstest2", "preparationtest2", images, videos);
+    	Recipe updateRecipe = new Recipe("nametest3", "descriptiontest3", "ingredientstest3", "preparationtest3", images, videos);
+    	
+    	String id = recipesRepository.save(recipe)._id;
+    	String badId = "1";
+    	
+    	HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON));
+        headers.add("Authorization", "Auth " + tokenAuth);
+        
+        HttpEntity entity = new HttpEntity(updateRecipe, headers);
+        
+        ResponseEntity responseEntity = restTemplate.exchange(
+                "/recipes/"+badId, 
+                HttpMethod.DELETE, 
+                entity, 
+                String.class);
+    	
+    	assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+    }
 
 }

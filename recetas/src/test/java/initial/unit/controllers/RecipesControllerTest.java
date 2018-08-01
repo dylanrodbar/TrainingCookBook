@@ -71,25 +71,8 @@ public class RecipesControllerTest {
 	            .andExpect(status().isOk());
 	}
 	
-	@Test
-	public void shouldReturn200WhenGettingAllRecipeImages() throws Exception {
-		
-		mvc.perform(get("/recipes/1/images")
-	            .with(user("dylan1234").password("dylan12345"))
-	            .contentType(APPLICATION_JSON))
-	            .andExpect(status().isOk());
-		
-	}
 	
-	@Test
-	public void shouldReturn200WhenGettingARecipeById() throws Exception {
-		
-		mvc.perform(get("/recipes/1")
-	            .with(user("dylan1234").password("dylan12345"))
-	            .contentType(APPLICATION_JSON))
-	            .andExpect(status().isOk());
-		
-	}
+	
 	
 	@Test
 	public void shouldReturnImageListResponseEntityWhenGettingImagesForARecipe() throws Exception {
@@ -204,6 +187,16 @@ public class RecipesControllerTest {
 		
 		given(recipesController.updateRecipe(recipe._id, recipe)).willReturn(response);
 		
+	}
+	
+	@Test
+	public void shouldReturn200WhenDeletingARecipe() throws Exception {
+		Recipe recipe = new Recipe("test", "test", "test", "test", null, null);
+		
+		ResponseEntity response = new ResponseEntity(HttpStatus.OK);
+		
+		
+		given(recipesController.deleteRecipe(recipe._id)).willReturn(response);
 	}
 	
 
