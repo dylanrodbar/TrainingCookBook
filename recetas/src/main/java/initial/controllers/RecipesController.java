@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import initial.models.Image;
 import initial.models.Recipe;
-import initial.models.Users;
 import initial.repositories.RecipesRepository;
 
 @RestController
@@ -101,6 +100,26 @@ public class RecipesController {
 		
 	}
 	
+	@PutMapping("/{id}")
+	public ResponseEntity updateRecipe(@PathVariable String id, @RequestBody Recipe recipe) {
+		Optional<Recipe> optionalRecipe = recipeRepository.findById(id);
+		Recipe recipeUpdate;
+		
+		
+		if(optionalRecipe.isPresent()) {
+			recipeUpdate = optionalRecipe.get();
+			recipeUpdate.setName(recipe.getName());
+			recipeUpdate.setDescription(recipe.getDescription());
+			recipeUpdate.setIngredients(recipe.getIngredients());
+			recipeUpdate.setPreparation(recipe.getPreparation());
+			recipeUpdate.setImages(recipe.getImages());
+			recipeUpdate.setVideos(recipe.getVideos());
+			recipeRepository.save(recipeUpdate);
+			return new ResponseEntity<>(recipeUpdate, HttpStatus.OK);
+		}
+		
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	}
 	
 	
 	

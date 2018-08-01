@@ -194,6 +194,18 @@ public class RecipesControllerTest {
 		
 	}
 	
+	
+	@Test
+	public void shouldReturnRecipeWhenUpdatingARecipe() throws Exception {
+		Recipe recipe = new Recipe("test", "test", "test", "test", null, null);
+		
+		ResponseEntity response = new ResponseEntity(recipe, HttpStatus.OK);
+		
+		
+		given(recipesController.updateRecipe(recipe._id, recipe)).willReturn(response);
+		
+	}
+	
 
 
 }
