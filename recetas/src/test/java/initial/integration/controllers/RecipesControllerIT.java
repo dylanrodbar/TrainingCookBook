@@ -424,5 +424,67 @@ public class RecipesControllerIT {
     	
     	assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
     }
+    
+    
+    @Test
+    public void shouldReturnCorrectDataWhenAddingAImageToRecipe() throws Exception {
+    	ArrayList<Image> images = new ArrayList<>();
+    	ArrayList<Video> videos = new ArrayList<>();
+    	images.add(new Image("linktestimage10"));
+    	images.add(new Image("linktestimage11"));
+    	videos.add(new Video("linktestvideo12"));
+    	Recipe recipe = new Recipe("nametest2", "descriptiontest2", "ingredientstest2", "preparationtest2", images, videos);
+    	
+    	String id = recipesRepository.save(recipe)._id;
+    	
+    	Image newImage = new Image("new link test");
+    	
+    	HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON));
+        headers.add("Authorization", "Auth " + tokenAuth);
+        
+        HttpEntity entity = new HttpEntity(newImage, headers);
+        
+        ResponseEntity<Recipe> responseEntity = restTemplate.exchange(
+                "/recipes/"+id+"/images/link", 
+                HttpMethod.PUT, 
+                entity, 
+                Recipe.class);
+    	
+        assertEquals(responseEntity.getBody().getImages().get(2).getLink(), newImage.getLink());
+    	
+    }
+    
+    
+    @Test
+    public void shouldReturnCorrectDataWhenAddingAVideoToRecipe() throws Exception {
+    	ArrayList<Image> images = new ArrayList<>();
+    	ArrayList<Video> videos = new ArrayList<>();
+    	images.add(new Image("linktestimage10"));
+    	images.add(new Image("linktestimage11"));
+    	videos.add(new Video("linktestvideo12"));
+    	Recipe recipe = new Recipe("nametest2", "descriptiontest2", "ingredientstest2", "preparationtest2", images, videos);
+    	
+    	String id = recipesRepository.save(recipe)._id;
+    	
+    	Video newVideo = new Video("new link test");
+    	
+    	HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON));
+        headers.add("Authorization", "Auth " + tokenAuth);
+        
+        HttpEntity entity = new HttpEntity(newVideo, headers);
+        
+        ResponseEntity<Recipe> responseEntity = restTemplate.exchange(
+                "/recipes/"+id+"/videos/link", 
+                HttpMethod.PUT, 
+                entity, 
+                Recipe.class);
+    	
+        assertEquals(responseEntity.getBody().getVideos().get(1).getLink(), newVideo.getLink());
+    	
+    }
 
 }

@@ -199,6 +199,37 @@ public class RecipesControllerTest {
 		given(recipesController.deleteRecipe(recipe._id)).willReturn(response);
 	}
 	
+	
+	@Test
+	public void shouldReturn200WhenAddingImageLink() throws Exception {
+		ArrayList<Image> images = new ArrayList<>();
+    	ArrayList<Video> videos = new ArrayList<>();
+    	images.add(new Image("linktestimage10"));
+    	images.add(new Image("linktestimage11"));
+    	videos.add(new Video("linktestvideo12"));
+		Recipe recipe = new Recipe("test", "test", "test", "test", images, videos);
+		
+		ResponseEntity response = new ResponseEntity(recipe, HttpStatus.OK);
+		
+		
+		given(recipesController.addImageLink(recipe._id, new Image("new link"))).willReturn(response);
+	}
+	
+	@Test
+	public void shouldReturn200WhenAddingVideoLink() throws Exception {
+		ArrayList<Image> images = new ArrayList<>();
+    	ArrayList<Video> videos = new ArrayList<>();
+    	images.add(new Image("linktestimage10"));
+    	images.add(new Image("linktestimage11"));
+    	videos.add(new Video("linktestvideo12"));
+		Recipe recipe = new Recipe("test", "test", "test", "test", images, videos);
+		
+		ResponseEntity response = new ResponseEntity(recipe, HttpStatus.OK);
+		
+		
+		given(recipesController.addVideoLink(recipe._id, new Video("new link"))).willReturn(response);
+	}
+	
 
 
 }
