@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document
+@Document(collection = "recipe")
 public class Recipe {
 	
 	@Id
@@ -18,17 +18,19 @@ public class Recipe {
 	private String description;
 	private String ingredients;
 	private String preparation;
-	private ArrayList<String> images;
-	private ArrayList<String> videos;
+	private ArrayList<Image> images;
+	private ArrayList<Video> videos;
 	
 	
 	public Recipe() {}
 	
-	public Recipe(String name, String description, String ingredients, String preparation) {
+	public Recipe(String name, String description, String ingredients, String preparation, ArrayList<Image> images, ArrayList<Video> videos) {
 		this.name = name;
 		this.description = description;
 		this.ingredients = ingredients;
 		this.preparation = preparation;
+		this.images = images;
+		this.videos = videos;
 	}
 
 	public String getName() {
@@ -63,20 +65,20 @@ public class Recipe {
 		this.preparation = preparation;
 	}
 
-	public ArrayList<String> getImages() {
+	public ArrayList<Image> getImages() {
 		return images;
 	}
 
-	public void setImages(ArrayList<String> images) {
+	public void setImages(ArrayList<Image> images) {
 		this.images = images;
 	}
 	
-	public ArrayList<String> getVideos() {
+	public ArrayList<Video> getVideos() {
 		return videos;
 	}
 
-	public void setVideos(ArrayList<String> videos) {
-		this.images = videos;
+	public void setVideos(ArrayList<Video> videos) {
+		this.videos = videos;
 	}
 	
 	

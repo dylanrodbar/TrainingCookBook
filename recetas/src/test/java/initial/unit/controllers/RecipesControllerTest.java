@@ -15,22 +15,41 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+
+
 import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static java.util.Collections.singletonList;
 
 import initial.controllers.AuthenticationController;
 import initial.controllers.RecipesController;
 import initial.controllers.UsersController;
+import initial.models.Image;
 import initial.models.Recipe;
-import initial.models.Users;
+import initial.models.Video;
+import junit.framework.Assert;
+import static org.mockito.BDDMockito.given;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static initial.constants.TestUrl.RECIPES;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(RecipesController.class)
@@ -42,49 +61,139 @@ public class RecipesControllerTest {
 	@MockBean
 	private RecipesController recipesController;
 	
+
+	
 	@Test
-	public void testShouldReturnAllRecipes() throws Exception {
-		
-	    Recipe recipe = new Recipe();
-	    recipe.setName("new recipe test");
-	    recipe.setDescription("new description test");
-	    recipe.setIngredients("new ingredients test");
-	    recipe.setPreparation("new preparation test");
-
-	    List<Recipe> allRecipes = singletonList(recipe);
-
-	    given(recipesController.getAllRecipes()).willReturn(allRecipes);
-
-	    mvc.perform(get(RECIPES)
+	public void shouldReturn200WhenGettingAllRecipes() throws Exception {
+		mvc.perform(get(RECIPES)
 	            .with(user("dylan1234").password("dylan12345"))
 	            .contentType(APPLICATION_JSON))
-	            .andExpect(status().isOk())
-	            .andExpect(jsonPath("$", hasSize(1)))
-	            .andExpect(jsonPath("$[0].name", is(recipe.getName())))
-	            .andExpect(jsonPath("$[0].description", is(recipe.getDescription())))
-	            .andExpect(jsonPath("$[0].ingredients", is(recipe.getIngredients())))
-	            .andExpect(jsonPath("$[0].preparation", is(recipe.getPreparation())));	
-	            	
+	            .andExpect(status().isOk());
 	}
 	
+	@Test
+	public void shouldReturn200WhenGettingAllRecipeImages() throws Exception {
+		
+		mvc.perform(get("/recipes/1/images")
+	            .with(user("dylan1234").password("dylan12345"))
+	            .contentType(APPLICATION_JSON))
+	            .andExpect(status().isOk());
+		
+	}
+	
+	@Test
+	public void shouldReturn200WhenGettingARecipeById() throws Exception {
+		
+		mvc.perform(get("/recipes/1")
+	            .with(user("dylan1234").password("dylan12345"))
+	            .contentType(APPLICATION_JSON))
+	            .andExpect(status().isOk());
+		
+	}
+	
+	@Test
+	public void shouldReturnImageListResponseEntityWhenGettingImagesForARecipe() throws Exception {
+		Recipe recipe = new Recipe();
+		recipe.setName("nametest");
+		recipe.setDescription("descriptiontest");
+		recipe.setIngredients("ingredientstest");
+		recipe.setPreparation("preparationtest");
+		
+		ArrayList<String> images = new ArrayList<>();
+		ArrayList<String> videos = new ArrayList<>();
+		
+		images.add("image test");
+		videos.add("video test");
+		
+		ResponseEntity response = new ResponseEntity(images, HttpStatus.OK);
+		
+		given(recipesController.getAllRecipeImages(recipe._id)).willReturn(response);
+	}
+	
+	@Test
+	public void shouldReturnImageListResponseEntityWhenGettingVideosForARecipe() throws Exception {
+		Recipe recipe = new Recipe();
+		recipe.setName("nametest");
+		recipe.setDescription("descriptiontest");
+		recipe.setIngredients("ingredientstest");
+		recipe.setPreparation("preparationtest");
+		
+		ArrayList<Image> images = new ArrayList<>();
+		ArrayList<Video> videos = new ArrayList<>();
+		
+		images.add(new Image("link1"));
+		videos.add(new Video("link2"));
+		
+		ResponseEntity response = new ResponseEntity(videos, HttpStatus.OK);
+		
+		given(recipesController.getAllRecipeImages(recipe._id)).willReturn(response);
+	}
 	
 	
 	@Test
-	public void shouldReturn200WhenCreateANewRecipe() throws Exception {
+	public void shouldReturnRecipeListResponseEntityWhenGettingAllRecipes() throws Exception {
 		
-		Recipe recipe = new Recipe("new", "new", "new", "new");
+		Recipe recipe = new Recipe();
+		recipe.setName("nametest");
+		recipe.setDescription("descriptiontest");
+		recipe.setIngredients("ingredientstest");
+		recipe.setPreparation("preparationtest");
 		
-		mvc.perform(post("/recipes")
-				.with(user("dylan1234").password("dylan12345"))
-				.contentType(MediaType.APPLICATION_JSON_UTF8)
-				.with(csrf())
-				.param("name", recipe.getName())
-	            .param("description", recipe.getDescription())
-	            .param("ingredients",recipe.getIngredients())
-	            .param("preparation", recipe.getPreparation())) 
-                .andExpect(status().isOk());
+		ArrayList<Image> images = new ArrayList<>();
+		ArrayList<Video> videos = new ArrayList<>();
+		
+		images.add(new Image("link1"));
+		videos.add(new Video("link2"));
+		
+		List<Recipe> recipes = singletonList(recipe);
+		
+		ResponseEntity response = new ResponseEntity(recipes, HttpStatus.OK);
+		
+		given(recipesController.getAllRecipes()).willReturn(response);
 	}
 	
 	
+	@Test
+	public void shouldReturn200WhenAddingANewRecipe() throws Exception {
+		
+		ArrayList<Image> images = new ArrayList<>();
+		ArrayList<Video> videos = new ArrayList<>();
+		
+		images.add(new Image("link1"));
+		videos.add(new Video("link2"));
+		
+		Recipe recipe = new Recipe("nametest", "descriptiontest", "ingredientstest", "preparationtest", images, videos);
+		
+		mvc.perform(post(RECIPES)
+	            .with(user("dylan1234").password("dylan12345"))
+	            .contentType(APPLICATION_JSON)
+	            .with(csrf())
+				.content(new ObjectMapper().writeValueAsBytes(recipe)))
+	            .andExpect(status().isOk());
+		
+		
+		
+	}
+	
+	@Test
+	public void shouldReturnRecipeWhenAddingANewRecipe() throws Exception {
+		
+		ArrayList<Image> images = new ArrayList<>();
+		ArrayList<Video> videos = new ArrayList<>();
+		
+		images.add(new Image("link1"));
+		videos.add(new Video("link2"));
+		
+		Recipe recipe = new Recipe("nametest", "descriptiontest", "ingredientstest", "preparationtest", images, videos);
+		
+		ResponseEntity response = new ResponseEntity(recipe, HttpStatus.OK);
+		
+		given(recipesController.addRecipe(recipe)).willReturn(response);
+		
+		
+		
+	}
+	
+
 
 }
